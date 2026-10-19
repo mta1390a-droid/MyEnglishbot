@@ -1,10 +1,15 @@
 # -*- coding: utf-8 -*-
 import logging
+import os
+import threading
+import time
+import requests
+from flask import Flask
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes
 
 # ✅ توکن ربات
-TOKEN = "8583951782:AAFPczZtUNffaaPTGMl4CeON1WDkPeJzwe4"
+TOKEN = os.getenv"BOT_TOKEN"
 
 logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO)
 
@@ -374,6 +379,37 @@ def main():
     app.add_handler(CallbackQueryHandler(handle_button))
     print("ربات روشن شد. برای توقف، برنامه را متوقف کن.")
     app.run_polling()
+# --- بخش مربوط به Render ---
+import threading
+import time
+import requests
+from flask import Flask
 
+web_app = Flask(name)
+
+@web_app.route('/')
+def health_check():
+    return "Bot is running!", 200
+
+def run_flask():
+    import os
+    port = int(os.environ.get("PORT", 8080))
+    web_app.run(host='0.0.0.0', port=port)
+
+def keep_alive():
+    import os
+    url = os.environ.get("RENDER_EXTERNAL_URL")
+    while True:
+        if url:
+            try:
+                requests.get(url, timeout=10)
+            except Exception:
+                pass
+        time.sleep(240)
+
+# اجرای وب سرور و سیستم بیدار نگهدارنده
+threading.Thread(target=run_flask, daemon=True).start()
+threading.Thread(target=keep_alive, daemon=True).start()
+# ---------------------------
 if __name__ == "__main__":
     main()
